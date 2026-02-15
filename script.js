@@ -120,7 +120,10 @@ const displayController = (function displayController() {
     const playerTwo = document.getElementById("playerTwo");
     const cells = document.getElementById("gameContainer");
     const status = document.getElementById("status");
-    
+    const playerOneDisplay = document.getElementById("playerOneDisplay");
+    const playerTwoDisplay = document.getElementById("playerTwoDisplay");
+
+
     const bindEvents = () => {
 
         newGameBtn.addEventListener("click", () => {
@@ -144,6 +147,7 @@ const displayController = (function displayController() {
             playerTwo.value = "";
             renderBoard();
             renderStatus();
+            renderActivePlayer();
         });
 
         cancelNewBtn.addEventListener("click", () => {
@@ -161,6 +165,7 @@ const displayController = (function displayController() {
             const result = gameController.playerTurn(cellId);
             renderBoard();
             renderStatus(result);
+            renderActivePlayer();
         })
     }
 
@@ -202,7 +207,19 @@ const displayController = (function displayController() {
         }
     }
 
-    return {bindEvents, displayNames, renderBoard, renderStatus}
+    const renderActivePlayer = () => {
+        const activePlayer = gameController.getActivePlayer();
+        playerOneDisplay.classList.remove("active");
+        playerTwoDisplay.classList.remove("active");
+        if (activePlayer.mark === "X") {
+            playerOneDisplay.classList.add("active");
+        } else {
+            playerTwoDisplay.classList.add("active");
+        }
+    }
+
+
+    return {bindEvents, displayNames, renderBoard, renderStatus, renderActivePlayer}
 })();
 
 displayController.bindEvents();
