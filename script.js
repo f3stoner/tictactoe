@@ -59,6 +59,12 @@ const gameController = (function gameController() {
     const newGame = (playerOneName, playerTwoName) => {
         gameboard.reset();
         gameState = "active";
+        if (playerOneName.trim() === "") {
+            playerOneName = "Player One";
+        }
+        if (playerTwoName.trim() === "") {
+            playerTwoName = "Player Two";
+        }
         playerOne = createPlayer(playerOneName, "X");
         playerTwo = createPlayer(playerTwoName, "O");
         winner = null;
@@ -189,7 +195,7 @@ const displayController = (function displayController() {
         }
         else if (gameState === "win") {
             status.textContent = `${winner.name} wins!!!`;
-            
+
         }
         else if (gameState === "tie") {
             status.textContent = "It's a tie! Try Again!";

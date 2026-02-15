@@ -34,7 +34,6 @@ body, html {
     grid-template-rows: repeat(3, 1fr);
     aspect-ratio: 1 / 1;
     width: min(92vw, 600px);
-    height: min(92vw, 600px);
 }
 
 .cell {
