@@ -69,7 +69,8 @@ const gameController = (function gameController() {
         if (gameState !== "active") {
             return gameState;
         }
-        if (gameboard.placeMark(position, activePlayer.mark) === true) {
+        const markSuccess = gameboard.placeMark(position, activePlayer.mark);
+        if (markSuccess === true) {
             if (checkWin() === true) {
                 gameState = "win";
                 winner = activePlayer;
@@ -80,6 +81,9 @@ const gameController = (function gameController() {
             } else {
             activePlayer = activePlayer === playerOne ? playerTwo : playerOne;
         }}
+        else if (markSuccess === false) {
+            return "invalid";
+        }
         return gameState;
     }
 
@@ -95,8 +99,105 @@ const gameController = (function gameController() {
         return winner;
     }
 
-
     return {checkWin, checkTie, createPlayer, newGame, playerTurn, getActivePlayer, getGameState, getWinner}
 })();
 
+const displayController = (function displayController() {
+    const newGameBtn = document.getElementById("newGame");
+    const newConfirmDia = document.getElementById("confirmNewDialog");
+    const cancelBtn = document.getElementById("cancel");
+    const confirmBtn = document.getElementById("confirm");
+    const newGameDia = document.getElementById("newGameDialog")
+    const startNewBtn = document.getElementById("start");
+    const cancelNewBtn = document.getElementById("cancelNew");
+    const playerOne = document.getElementById("playerOne");
+    const playerTwo = document.getElementById("playerTwo");
+    const cells = document.getElementById("gameContainer");
+    const status = document.getElementById("status");
+    
+    const bindEvents = () => {
 
+        newGameBtn.addEventListener("click", () => {
+            newConfirmDia.showModal();
+        });
+
+        cancelBtn.addEventListener("click", () => {
+            newConfirmDia.close();
+        });
+
+        confirmBtn.addEventListener("click", () => {
+            newGameDia.showModal();
+            newConfirmDia.close();
+        });
+
+        startNewBtn.addEventListener("click", () => {
+            gameController.newGame(playerOne.value, playerTwo.value);
+            displayNames(playerOne.value, playerTwo.value);
+            newGameDia.close();
+            playerOne.value = "";
+            playerTwo.value = "";
+            renderBoard();
+            renderStatus();
+        });
+
+        cancelNewBtn.addEventListener("click", () => {
+            newGameDia.close();
+            playerOne.value = "";
+            playerTwo.value = "";
+        });
+
+        cells.addEventListener("click", (event) => {
+            const cellElement = event.target.closest(".cell");
+            if (!cellElement) {
+                return;
+            }
+            const cellId = Number(cellElement.dataset.index);
+            const result = gameController.playerTurn(cellId);
+            renderBoard();
+            renderStatus(result);
+        })
+    }
+
+    const displayNames = (playerOneName, playerTwoName) => {
+        const playerOne = document.getElementById("playerOneName");
+        const playerTwo = document.getElementById("playerTwoName");
+        playerOne.textContent = playerOneName;
+        playerTwo.textContent = playerTwoName;
+    }
+
+    const renderBoard = () => {
+        const cells = document.querySelectorAll(".cell")
+        const board = gameboard.getBoard();
+        for (const cell of cells) {
+            const index = Number(cell.dataset.index)
+            cell.textContent = board[index];
+        }
+    }
+
+    const renderStatus = (result) => {
+        const gameState = gameController.getGameState();
+        const activePlayer = gameController.getActivePlayer();
+        const winner = gameController.getWinner();
+        if (result === "invalid") {
+            status.textContent = "Invalid Move! Please try again."
+        }
+        else if (gameState === null) {
+            status.textContent = "Please click Start New Game to begin!";
+        }
+        else if (gameState === "active") {
+            status.textContent = `${activePlayer.name}'s turn! ${activePlayer.mark}`;
+        }
+        else if (gameState === "win") {
+            status.textContent = `${winner.name} wins!!!`;
+            
+        }
+        else if (gameState === "tie") {
+            status.textContent = "It's a tie! Try Again!";
+        }
+    }
+
+    return {bindEvents, displayNames, renderBoard, renderStatus}
+})();
+
+displayController.bindEvents();
+displayController.renderStatus();
